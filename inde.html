@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分页demo</title>
+    <style>
+        a{margin: 5px;}
+    </style>
+</head>
+<body>
+    <div id="div1">
+<!--
+        <a href="1">首页</a>
+        <a href="3">上一页</a>
+        <a href="2">[2]</a>
+        <a href="3">[3]</a>
+        <a href="4">4</a>
+        <a href="5">[5]</a>
+        <a href="6">[6]</a>
+        <a href="5">下一页</a>
+        <a href="10">尾页</a>
+-->
+    </div>
+<script>
+function page(opt){
+    if(!opt.id){
+        return false;
+    };
+    var obj = document.getElementById(opt.id);
+    var nowNum = opt.nowNum || 1;
+    var childLength = opt.childLength;
+    var allNum = opt.allNum || childLength;
+    var callback = opt.callback || function(){};
+    // 可显示页数二分之一+1的位置
+    var point = Math.floor(childLength/2) + 1;
+    //总页数大于可显示页数，并且当前页大于一半+1的可显示页数,显示首页,例如可显示8页，总页数大于8，并且当前页大于5的时候显示首页
+    if(nowNum > point && allNum > childLength){
+        var oA = document.createElement('a');
+        oA.href = '#1';
+        oA.innerHTML = '首页';
+        obj.appendChild(oA);
+    }
+    //当前页不等于1显示上一页
+    if(nowNum != 1){
+        var oA = document.createElement('a');
+        oA.href = '#' + (nowNum - 1);
+        oA.innerHTML = '上一页';
+        obj.appendChild(oA);
+    }
+    //生成具体页数，总页数小于等于可显示页数的情况
+    if(allNum <= childLength){
+        for(var i=1;i<=allNum;i++){
+            var oA =document.createElement('a');
+            oA.href = '#' + i;
+            if(nowNum == i){
+                oA.innerHTML = i;
+            }
+            else{
+                oA.innerHTML = '[' + i + ']';
+            }
+            obj.appendChild(oA);
+        }
+    }
+    //生成具体页数，总页数大于可显示页数的情况
+    else{
+        for(var i=1;i<=childLength;i++){
+            var oA = document.createElement('a');
+            //当前页是小于一半+1的可显示页数
+            if(nowNum < point){
+                oA.href = '#' + i;
+                if(nowNum == i){
+                    oA.innerHTML = i;
+                }
+                else{
+                    oA.innerHTML = '[' + i + ']';
+                }
+            }
+            //当前页是倒数第1或倒数第2
+            else if(allNum - nowNum <= point){
+                oA.href = '#' + (allNum - childLength +i);
+                if(nowNum == allNum - childLength +i){
+                    oA.innerHTML = (allNum - childLength +i);
+                }
+                else{
+                     oA.innerHTML = '[' + (allNum - childLength +i) + ']';
+                }
+            }
+            //当前页在可显示页数一半+1的位置显示，例如可以显示8页，当前页就在第5个位置
+            else{
+                oA.href = '#' + (nowNum - point + i);
+                if(i == point){
+                    oA.innerHTML = (nowNum - point + i);
+                }
+                else{
+                    oA.innerHTML = '[' + (nowNum - point + i) + ']';
+                }
+            }
+            obj.appendChild(oA);
+        }
+    }
+    //当前页不是最后一页时显示下一页
+    if(allNum != nowNum){
+        var oA = document.createElement('a');
+        oA.href = '#' + (nowNum + 1);
+        oA.innerHTML = '下一页';
+        obj.appendChild(oA);                
+    }
+    //总页数大于可显示页数，并且当前页大于一半-1的可显示页数
+    if(allNum - nowNum > point && allNum > childLength){
+        var oA = document.createElement('a');
+        oA.href = '#' + allNum;
+        oA.innerHTML = '尾页';
+        obj.appendChild(oA);
+    }
+    
+    callback(nowNum,allNum);
+    
+    var aA = obj.getElementsByTagName('a');
+    for(var i=0;i<aA.length;i++){
+        aA[i].onclick=function(){
+            var nowNum = parseInt(this.getAttribute('href').substring(1));
+            obj.innerHTML = '';
+            page({
+                id:opt.id,
+                nowNum:nowNum,
+                allNum:allNum,
+                childLength:childLength,
+                callback:callback
+            });
+            return false;
+        }
+    }
+}
+page({
+    id:'div1',
+    nowNum:2,
+    allNum:4,
+    childLength:12,
+    callback:function(now,all){
+        console.log(now);
+    }
+});
+</script>
+</body>
+</html>
